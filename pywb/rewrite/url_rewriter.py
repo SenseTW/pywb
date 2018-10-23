@@ -34,6 +34,11 @@ class UrlRewriter(object):
         self.cookie_scope = cookie_scope
         self.rewrite_opts = rewrite_opts
 
+        if rewrite_opts.get("client"):
+            self.no_rewrite_domain = rewrite_opts.get("client").get("no_rewrite_domain")
+        else:
+            self.no_rewrite_domain = None
+
         if rewrite_opts.get('punycode_links'):
             self.wburl._do_percent_encode = False
 
@@ -41,6 +46,12 @@ class UrlRewriter(object):
         # if special protocol, no rewriting at all
         if url.startswith(self.NO_REWRITE_URI_PREFIX):
             return url
+
+        # SenseTW: addition ignore domain
+        if self.no_rewrite_domain:
+            ori_url = urlparse.urlparse(url)
+            if ori_url and ori_url.netloc.endswith(tuple(self.no_rewrite_domain)):
+                return url
 
         if (self.prefix and
              self.prefix != '/' and

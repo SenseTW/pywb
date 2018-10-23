@@ -109,6 +109,23 @@ var wombat_internal = function($wbwindow) {
     }
 
     //============================================
+    function ends_with_arr(string, arr_or_prefix) {
+        if (!string) { return undefined; }
+
+        if (arr_or_prefix instanceof Array) {
+            for (var i = 0; i < arr_or_prefix.length; i++) {
+                if (string.indexOf(arr_or_prefix[i], string.length - arr_or_prefix[i].length) !== -1) {
+                    return arr_or_prefix[i];
+                }
+            }
+        } else if (string.indexOf(arr_or_prefix, string.length - arr_or_prefix.length) !== -1) {
+            return arr_or_prefix;
+        }
+
+        return undefined;
+    }
+
+    //============================================
     var rewrite_url = rewrite_url_;
 
     function rewrite_url_debug(url, use_rel, mod) {
@@ -183,6 +200,19 @@ var wombat_internal = function($wbwindow) {
                 return url;
             }
         }
+
+        // SenseTW: additional ignore domain
+        if (wb_opts.no_rewrite_domain) {
+            var _ori_url = url;
+            if (starts_with(_ori_url, wbinfo.prefix)) {
+                _ori_url = _ori_url.replace(wbinfo.prefix+mod+"/","");
+            }
+            var _ori_host = _ori_url.match(/(https?:)?\/\/(.[^/]+)(.*)/)[2];
+            if (ends_with_arr(_ori_host, wb_opts.no_rewrite_domain)) {
+                return _ori_url;
+            }
+        }
+
 
         // If starts with prefix, no rewriting needed
         // Only check replay prefix (no date) as date may be different for each
