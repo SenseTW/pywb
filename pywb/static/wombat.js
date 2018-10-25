@@ -207,9 +207,12 @@ var wombat_internal = function($wbwindow) {
             if (starts_with(_ori_url, wbinfo.prefix)) {
                 _ori_url = _ori_url.replace(wbinfo.prefix+mod+"/","");
             }
-            var _ori_host = _ori_url.match(/(https?:)?\/\/(.[^/]+)(.*)/)[2];
-            if (ends_with_arr(_ori_host, wb_opts.no_rewrite_domain)) {
-                return _ori_url;
+            var _ori_url_resolve = _ori_url.match(/(https?:)?\/\/(.[^/]+)(.*)/);
+            if (_ori_url_resolve) {
+                var _ori_host = _ori_url_resolve[2];
+                if (_ori_host && ends_with_arr(_ori_host, wb_opts.no_rewrite_domain)) {
+                    return _ori_url;
+                }
             }
         }
 
